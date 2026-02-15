@@ -28,6 +28,7 @@
 #include "storage/buffer_manager/spiller.h"
 #include "storage/storage_manager.h"
 #include "transaction/transaction_context.h"
+#include <cstdlib>
 #include <format>
 #include <processor/warning_context.h>
 
