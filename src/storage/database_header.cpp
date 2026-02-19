@@ -66,6 +66,8 @@ static void writeMagicBytes(common::Serializer& serializer) {
     }
 }
 
+static constexpr uint8_t HEADER_FORMAT_VERSION_WITH_DATAFILE_NUM_PAGES = 2;
+
 void DatabaseHeader::serialize(common::Serializer& ser) const {
     writeMagicBytes(ser);
     ser.writeDebuggingInfo("storage_version");
