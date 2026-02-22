@@ -153,6 +153,12 @@ protected:
         return op;
     }
 
+    virtual void visitScopeScan(planner::LogicalOperator* /*op*/) {}
+    virtual std::shared_ptr<planner::LogicalOperator> visitScopeScanReplace(
+        std::shared_ptr<planner::LogicalOperator> op) {
+        return op;
+    }
+
     virtual void visitSetProperty(planner::LogicalOperator*) {}
     virtual std::shared_ptr<planner::LogicalOperator> visitSetPropertyReplace(
         std::shared_ptr<planner::LogicalOperator> op) {

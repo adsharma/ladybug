@@ -49,6 +49,11 @@ std::unique_ptr<BoundReadingClause> Binder::bindCallSubquery(const ReadingClause
         }
     }
 
+    const auto* innerResult = boundInner.getStatementResult();
+    for (size_t i = 0; i < innerResult->getColumnNames().size(); ++i) {
+        scope.addExpression(innerResult->getColumnNames()[i], innerResult->getColumns()[i]);
+    }
+
     return std::make_unique<BoundCallSubquery>(std::move(boundInner), std::move(scopeExpressions));
 }
 

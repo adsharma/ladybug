@@ -249,6 +249,17 @@ describe("queryBatch", function () {
     assert.isFalse(results[1].isSuccess());
     assert.isNotEmpty(results[1].getErrorMessage());
   });
+
+  it("should return N results in order for a batch of N statements", async function () {
+    const N = 15;
+    const statements = Array.from({ length: N }, (_, i) => `RETURN ${i + 1}`);
+    const results = await conn.queryBatch(statements);
+    assert.exists(results);
+    assert.equal(results.length, N, "batch must return one result per statement");
+    const rows = await Promise.all(results.map((r) => r.getAll()));
+    const expected = Array.from({ length: N }, (_, i) => [{ [i + 1]: i + 1 }]);
+    assert.deepEqual(rows, expected, "results must match statement order and values");
+  });
 });
 
 describe("Timeout", function () {

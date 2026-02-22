@@ -15,6 +15,8 @@ assert.include = (container, value, msg) =>
   nodeAssert.ok(container.includes(value), msg || `expected ${container} to include ${value}`);
 assert.isEmpty = (val, msg) =>
   nodeAssert.strictEqual(val.length, 0, msg || `expected empty, got length ${val.length}`);
+assert.isNotEmpty = (val, msg) =>
+  nodeAssert.ok(val.length > 0, msg || `expected non-empty, got length ${val.length}`);
 assert.instanceOf = (obj, Ctor, msg) =>
   nodeAssert.ok(obj instanceof Ctor, msg || `expected instance of ${Ctor.name}`);
 assert.isNumber = (val, msg) =>

@@ -7,6 +7,10 @@ namespace planner {
 
 void LogicalProjection::computeFactorizedSchema() {
     auto childSchema = children[0]->getSchema();
+    if (!childSchema) {
+        createEmptySchema();
+        return;
+    }
     schema = childSchema->copy();
     schema->clearExpressionsInScope();
     for (auto& expression : expressions) {
@@ -41,8 +45,12 @@ void LogicalProjection::computeFactorizedSchema() {
 }
 
 void LogicalProjection::computeFlatSchema() {
-    copyChildSchema(0);
     auto childSchema = children[0]->getSchema();
+    if (!childSchema) {
+        createEmptySchema();
+        return;
+    }
+    copyChildSchema(0);
     schema->clearExpressionsInScope();
     for (auto& expression : expressions) {
         if (childSchema->isExpressionInScope(*expression)) {

@@ -29,6 +29,7 @@ add_library(lbug_processor_operator
         profile.cpp
         recursive_extend.cpp
         result_collector.cpp
+        scope_scan.cpp
         semi_masker.cpp
         sink.cpp
         skip.cpp

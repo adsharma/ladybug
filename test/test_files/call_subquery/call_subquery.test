@@ -1,0 +1,18 @@
+-DATASET CSV tinysnb
+
+--
+
+-CASE CallSubqueryUncorrelated
+-STATEMENT CALL () { RETURN 1 AS x } RETURN x
+---- 1
+1
+
+-CASE CallSubqueryUncorrelatedLiteral
+-STATEMENT CALL () { RETURN 2 AS a, 'b' AS b } RETURN a, b
+---- 1
+2|b
+
+-CASE CallSubqueryEmptyInner
+-STATEMENT CALL () { RETURN 1 AS c WHERE false } RETURN c
+---- 1
+|

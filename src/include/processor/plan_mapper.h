@@ -148,6 +148,8 @@ public:
         const planner::LogicalOperator* logicalOperator);
     std::unique_ptr<PhysicalOperator> mapScanNodeTable(
         const planner::LogicalOperator* logicalOperator);
+    std::unique_ptr<PhysicalOperator> mapScopeScan(
+        const planner::LogicalOperator* logicalOperator);
     std::unique_ptr<PhysicalOperator> mapSemiMasker(
         const planner::LogicalOperator* logicalOperator);
     std::unique_ptr<PhysicalOperator> mapSetProperty(

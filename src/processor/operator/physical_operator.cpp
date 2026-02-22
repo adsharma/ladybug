@@ -103,6 +103,8 @@ std::string PhysicalOperatorUtils::operatorTypeToString(PhysicalOperatorType ope
         return "SCAN_NODE_TABLE";
     case PhysicalOperatorType::SCAN_REL_TABLE:
         return "SCAN_REL_TABLE";
+    case PhysicalOperatorType::SCOPE_SCAN:
+        return "SCOPE_SCAN";
     case PhysicalOperatorType::SEMI_MASKER:
         return "SEMI_MASKER";
     case PhysicalOperatorType::SET_PROPERTY:

@@ -55,6 +55,7 @@ enum class LogicalOperatorType : uint8_t {
     PROJECTION,
     RECURSIVE_EXTEND,
     SCAN_NODE_TABLE,
+    SCOPE_SCAN,
     SEMI_MASKER,
     SET_PROPERTY,
     STANDALONE_CALL,
@@ -105,8 +106,14 @@ public:
     LogicalOperatorType getOperatorType() const { return operatorType; }
     bool hasUpdateRecursive();
 
-    // Schema
-    Schema* getSchema() const { return schema.get(); }
+    // Schema. Lazily computes factorized schema so callers never get null (e.g. when
+    // optimizers call getSchema() before SchemaPopulator has run).
+    Schema* getSchema() const {
+        if (!schema) {
+            const_cast<LogicalOperator*>(this)->computeFactorizedSchema();
+        }
+        return schema.get();
+    }
     virtual void computeFactorizedSchema() = 0;
     virtual void computeFlatSchema() = 0;
 

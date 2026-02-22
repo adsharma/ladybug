@@ -76,6 +76,9 @@ void LogicalOperatorVisitor::visitOperatorSwitch(LogicalOperator* op) {
     case LogicalOperatorType::SCAN_NODE_TABLE: {
         visitScanNodeTable(op);
     } break;
+    case LogicalOperatorType::SCOPE_SCAN: {
+        visitScopeScan(op);
+    } break;
     case LogicalOperatorType::SET_PROPERTY: {
         visitSetProperty(op);
     } break;
@@ -170,6 +173,9 @@ std::shared_ptr<LogicalOperator> LogicalOperatorVisitor::visitOperatorReplaceSwi
     }
     case LogicalOperatorType::SCAN_NODE_TABLE: {
         return visitScanNodeTableReplace(op);
+    }
+    case LogicalOperatorType::SCOPE_SCAN: {
+        return visitScopeScanReplace(op);
     }
     case LogicalOperatorType::SET_PROPERTY: {
         return visitSetPropertyReplace(op);

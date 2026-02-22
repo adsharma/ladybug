@@ -4,6 +4,7 @@
 #include "binder/query/reading_clause/bound_match_clause.h"
 #include "binder/query/reading_clause/bound_table_function_call.h"
 #include "planner/operator/logical_call_subquery.h"
+#include "planner/operator/scan/logical_scope_scan.h"
 #include "planner/planner.h"
 
 using namespace lbug::binder;
@@ -112,7 +113,13 @@ void Planner::planCallSubquery(const BoundReadingClause& readingClause, LogicalP
     auto outerOp = plan.getLastOperator();
     auto innerPlan = planSingleQuery(boundCall.getInnerQuery());
     KU_ASSERT(!innerPlan.isEmpty());
-    auto op = std::make_shared<LogicalCallSubquery>(std::move(outerOp), innerPlan.getLastOperator(),
+    auto innerRoot = innerPlan.getLastOperator();
+    if (!boundCall.getScopeExpressions().empty()) {
+        auto scopeScan = std::make_shared<LogicalScopeScan>(boundCall.getScopeExpressions());
+        scopeScan->addChild(innerRoot);
+        innerRoot = scopeScan;
+    }
+    auto op = std::make_shared<LogicalCallSubquery>(std::move(outerOp), innerRoot,
         boundCall.getScopeExpressions());
     plan.setLastOperator(std::move(op));
 }
