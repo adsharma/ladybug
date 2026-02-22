@@ -11,10 +11,9 @@ class LBUG_API LogicalCallSubquery final : public LogicalOperator {
 
 public:
     LogicalCallSubquery(std::shared_ptr<LogicalOperator> outerChild,
-        std::shared_ptr<LogicalOperator> innerPlan,
-        binder::expression_vector scopeExpressions)
-        : LogicalOperator{operatorType_, logical_op_vector_t{std::move(outerChild),
-              std::move(innerPlan)}},
+        std::shared_ptr<LogicalOperator> innerPlan, binder::expression_vector scopeExpressions)
+        : LogicalOperator{operatorType_,
+              logical_op_vector_t{std::move(outerChild), std::move(innerPlan)}},
           scopeExpressions{std::move(scopeExpressions)} {}
 
     std::shared_ptr<LogicalOperator> getOuterChild() const { return getChild(0); }

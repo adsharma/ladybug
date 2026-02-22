@@ -92,8 +92,7 @@ public:
     std::unique_ptr<ReadingClause> transformUnwind(CypherParser::OC_UnwindContext& ctx);
     std::vector<YieldVariable> transformYieldVariables(CypherParser::OC_YieldItemsContext& ctx);
     std::unique_ptr<ReadingClause> transformInQueryCall(CypherParser::KU_InQueryCallContext& ctx);
-    std::unique_ptr<ReadingClause> transformCallSubquery(
-        CypherParser::KU_CallSubqueryContext& ctx);
+    std::unique_ptr<ReadingClause> transformCallSubquery(CypherParser::KU_CallSubqueryContext& ctx);
     std::unique_ptr<ReadingClause> transformLoadFrom(CypherParser::KU_LoadFromContext& ctx);
     std::shared_ptr<JoinHintNode> transformJoinHint(CypherParser::KU_JoinNodeContext& ctx);
 

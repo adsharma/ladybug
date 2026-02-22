@@ -118,8 +118,8 @@ std::unique_ptr<ReadingClause> Transformer::transformCallSubquery(
         innerQuery.addReadingClause(transformReadingClause(*readingCtx));
     }
     innerQuery.setReturnClause(transformReturn(*bodyCtx.oC_Return()));
-    return std::make_unique<CallSubqueryClause>(
-        importAll, std::move(scopeVariableNames), std::move(innerQuery));
+    return std::make_unique<CallSubqueryClause>(importAll, std::move(scopeVariableNames),
+        std::move(innerQuery));
 }
 
 std::unique_ptr<ReadingClause> Transformer::transformLoadFrom(

@@ -112,8 +112,8 @@ void Planner::planCallSubquery(const BoundReadingClause& readingClause, LogicalP
     auto outerOp = plan.getLastOperator();
     auto innerPlan = planSingleQuery(boundCall.getInnerQuery());
     KU_ASSERT(!innerPlan.isEmpty());
-    auto op = std::make_shared<LogicalCallSubquery>(std::move(outerOp),
-        innerPlan.getLastOperator(), boundCall.getScopeExpressions());
+    auto op = std::make_shared<LogicalCallSubquery>(std::move(outerOp), innerPlan.getLastOperator(),
+        boundCall.getScopeExpressions());
     plan.setLastOperator(std::move(op));
 }
 

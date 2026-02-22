@@ -196,8 +196,8 @@ public:
     ConnectionQueryBatchAsyncWorker(Napi::Function& callback,
         std::shared_ptr<Connection>& connection, std::vector<std::string> statements,
         std::vector<NodeQueryResult*> nodeResults)
-        : Napi::AsyncWorker(callback), connection(connection),
-          statements(std::move(statements)), nodeResults(std::move(nodeResults)) {}
+        : Napi::AsyncWorker(callback), connection(connection), statements(std::move(statements)),
+          nodeResults(std::move(nodeResults)) {}
 
     ~ConnectionQueryBatchAsyncWorker() override = default;
 

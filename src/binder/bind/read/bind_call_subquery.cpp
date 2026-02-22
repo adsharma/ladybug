@@ -10,14 +10,12 @@ using namespace lbug::parser;
 namespace lbug {
 namespace binder {
 
-std::unique_ptr<BoundReadingClause> Binder::bindCallSubquery(
-    const ReadingClause& readingClause) {
+std::unique_ptr<BoundReadingClause> Binder::bindCallSubquery(const ReadingClause& readingClause) {
     auto& call = readingClause.constCast<CallSubqueryClause>();
     const auto& innerQuery = call.getInnerQuery();
 
     if (innerQuery.getNumUpdatingClauses() > 0) {
-        throw BinderException(
-            "CALL subquery body must not contain updating clauses.");
+        throw BinderException("CALL subquery body must not contain updating clauses.");
     }
 
     expression_vector scopeExpressions;
@@ -51,8 +49,7 @@ std::unique_ptr<BoundReadingClause> Binder::bindCallSubquery(
         }
     }
 
-    return std::make_unique<BoundCallSubquery>(
-        std::move(boundInner), std::move(scopeExpressions));
+    return std::make_unique<BoundCallSubquery>(std::move(boundInner), std::move(scopeExpressions));
 }
 
 } // namespace binder

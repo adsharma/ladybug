@@ -167,8 +167,7 @@ Napi::Value NodeConnection::QueryBatchSync(const Napi::CallbackInfo& info) {
         statements.push_back(v.As<Napi::String>().Utf8Value());
     }
     if (resultsArr.Length() < statements.size()) {
-        Napi::Error::New(env,
-            "queryBatchSync: resultsArray length must be >= statements length.")
+        Napi::Error::New(env, "queryBatchSync: resultsArray length must be >= statements length.")
             .ThrowAsJavaScriptException();
         return env.Undefined();
     }
@@ -190,8 +189,8 @@ Napi::Value NodeConnection::QueryBatchAsync(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     Napi::HandleScope scope(env);
     if (info.Length() < 3 || !info[0].IsArray() || !info[1].IsArray() || !info[2].IsFunction()) {
-        Napi::Error::New(env,
-            "queryBatchAsync(statements, resultsArray, callback) requires two arrays and a callback.")
+        Napi::Error::New(env, "queryBatchAsync(statements, resultsArray, callback) requires two "
+                              "arrays and a callback.")
             .ThrowAsJavaScriptException();
         return env.Undefined();
     }
@@ -210,8 +209,7 @@ Napi::Value NodeConnection::QueryBatchAsync(const Napi::CallbackInfo& info) {
         statements.push_back(v.As<Napi::String>().Utf8Value());
     }
     if (resultsArr.Length() < statements.size()) {
-        Napi::Error::New(env,
-            "queryBatchAsync: resultsArray length must be >= statements length.")
+        Napi::Error::New(env, "queryBatchAsync: resultsArray length must be >= statements length.")
             .ThrowAsJavaScriptException();
         return env.Undefined();
     }
@@ -221,8 +219,8 @@ Napi::Value NodeConnection::QueryBatchAsync(const Napi::CallbackInfo& info) {
         nodeResults.push_back(
             Napi::ObjectWrap<NodeQueryResult>::Unwrap(resultsArr.Get(i).As<Napi::Object>()));
     }
-    auto* worker = new ConnectionQueryBatchAsyncWorker(
-        callback, connection, std::move(statements), std::move(nodeResults));
+    auto* worker = new ConnectionQueryBatchAsyncWorker(callback, connection, std::move(statements),
+        std::move(nodeResults));
     worker->Queue();
     return env.Undefined();
 }
