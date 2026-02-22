@@ -107,12 +107,12 @@ DatabaseHeader DatabaseHeader::deserialize(common::Deserializer& deSer) {
     if (headerFormatVersion == HEADER_FORMAT_VERSION_WITH_DATAFILE_NUM_PAGES) {
         deSer.deserializeValue(dataFileNumPages);
     }
-    return {catalogPageRange, metaPageRange, dataFileNumPages, databaseID};
+    return {catalogPageRange, metaPageRange, databaseID, dataFileNumPages};
 }
 
 DatabaseHeader DatabaseHeader::createInitialHeader(common::RandomEngine* randomEngine) {
     // We generate a random UUID to act as the database ID
-    return DatabaseHeader{{}, {}, 0, common::UUID::generateRandomUUID(randomEngine)};
+    return DatabaseHeader{{}, {}, common::UUID::generateRandomUUID(randomEngine), 0};
 }
 
 std::optional<DatabaseHeader> DatabaseHeader::readDatabaseHeader(common::FileInfo& dataFileInfo) {
