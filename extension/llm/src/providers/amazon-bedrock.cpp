@@ -1,5 +1,8 @@
 #include "providers/amazon-bedrock.h"
 
+#include <memory>
+#include <string>
+
 #include "common/exception/runtime.h"
 #include "common/string_utils.h"
 #include "common/types/timestamp_t.h"
