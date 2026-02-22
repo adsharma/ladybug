@@ -86,6 +86,24 @@ class QueryResult {
   }
 
   /**
+   * Whether the query executed successfully.
+   * @returns {boolean}
+   */
+  isSuccess() {
+    this._checkClosed();
+    return this._queryResult.isSuccess();
+  }
+
+  /**
+   * Error message if the query failed.
+   * @returns {string}
+   */
+  getErrorMessage() {
+    this._checkClosed();
+    return this._queryResult.getErrorMessage();
+  }
+
+  /**
    * Iterate through the query result with callback functions.
    * @param {Function} resultCallback the callback function that is called for each row of the query result.
    * @param {Function} doneCallback the callback function that is called when the iteration is done.

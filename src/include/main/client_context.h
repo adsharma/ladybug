@@ -5,6 +5,7 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <vector>
 
 #include "common/arrow/arrow_result_config.h"
 #include "common/timer.h"
@@ -166,6 +167,11 @@ public:
 
     std::unique_ptr<QueryResult> query(std::string_view queryStatement,
         std::optional<uint64_t> queryID = std::nullopt, QueryConfig config = {});
+    /** Executes multiple queries in one lock and one transaction. Returns one result per input
+     * string; on first error stops and appends that error result, so results.size() <=
+     * statements.size(). */
+    std::vector<std::unique_ptr<QueryResult>> queryBatch(
+        const std::vector<std::string>& statements);
     std::unique_ptr<PreparedStatement> prepareWithParams(std::string_view query,
         std::unordered_map<std::string, std::unique_ptr<common::Value>> inputParams = {});
     std::unique_ptr<QueryResult> executeWithParams(PreparedStatement* preparedStatement,
@@ -222,6 +228,8 @@ private:
         std::optional<uint64_t> queryID = std::nullopt, QueryConfig config = {});
     std::unique_ptr<QueryResult> queryNoLock(std::string_view query,
         std::optional<uint64_t> queryID = std::nullopt, QueryConfig config = {});
+    std::vector<std::unique_ptr<QueryResult>> queryBatchNoLock(
+        const std::vector<std::string>& statements);
 
     bool canExecuteWriteQuery() const;
 

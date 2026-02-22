@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <vector>
 
 #include "include/node_database.h"
 #include "include/node_query_result.h"
@@ -20,6 +21,8 @@ Napi::Object NodeConnection::Init(Napi::Env env, Napi::Object exports) {
             InstanceMethod("queryAsync", &NodeConnection::QueryAsync),
             InstanceMethod("executeSync", &NodeConnection::ExecuteSync),
             InstanceMethod("querySync", &NodeConnection::QuerySync),
+            InstanceMethod("queryBatchSync", &NodeConnection::QueryBatchSync),
+            InstanceMethod("queryBatchAsync", &NodeConnection::QueryBatchAsync),
             InstanceMethod("setMaxNumThreadForExec", &NodeConnection::SetMaxNumThreadForExec),
             InstanceMethod("setQueryTimeout", &NodeConnection::SetQueryTimeout),
             InstanceMethod("interrupt", &NodeConnection::Interrupt),
@@ -139,6 +142,88 @@ Napi::Value NodeConnection::QuerySync(const Napi::CallbackInfo& info) {
     } catch (const std::exception& exc) {
         Napi::Error::New(env, std::string(exc.what())).ThrowAsJavaScriptException();
     }
+    return env.Undefined();
+}
+
+Napi::Value NodeConnection::QueryBatchSync(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    Napi::HandleScope scope(env);
+    if (info.Length() < 2 || !info[0].IsArray() || !info[1].IsArray()) {
+        Napi::Error::New(env, "queryBatchSync(statements, resultsArray) requires two arrays.")
+            .ThrowAsJavaScriptException();
+        return env.Undefined();
+    }
+    Napi::Array statementsArr = info[0].As<Napi::Array>();
+    Napi::Array resultsArr = info[1].As<Napi::Array>();
+    std::vector<std::string> statements;
+    statements.reserve(statementsArr.Length());
+    for (uint32_t i = 0; i < statementsArr.Length(); i++) {
+        Napi::Value v = statementsArr.Get(i);
+        if (!v.IsString()) {
+            Napi::Error::New(env, "queryBatchSync: each statement must be a string.")
+                .ThrowAsJavaScriptException();
+            return env.Undefined();
+        }
+        statements.push_back(v.As<Napi::String>().Utf8Value());
+    }
+    if (resultsArr.Length() < statements.size()) {
+        Napi::Error::New(env,
+            "queryBatchSync: resultsArray length must be >= statements length.")
+            .ThrowAsJavaScriptException();
+        return env.Undefined();
+    }
+    try {
+        auto results = connection->queryBatch(statements);
+        for (size_t i = 0; i < results.size(); i++) {
+            auto* nodeResult =
+                Napi::ObjectWrap<NodeQueryResult>::Unwrap(resultsArr.Get(i).As<Napi::Object>());
+            nodeResult->SetQueryResult(results[i].release(), true);
+        }
+        return Napi::Number::New(env, static_cast<uint32_t>(results.size()));
+    } catch (const std::exception& exc) {
+        Napi::Error::New(env, std::string(exc.what())).ThrowAsJavaScriptException();
+        return env.Undefined();
+    }
+}
+
+Napi::Value NodeConnection::QueryBatchAsync(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    Napi::HandleScope scope(env);
+    if (info.Length() < 3 || !info[0].IsArray() || !info[1].IsArray() || !info[2].IsFunction()) {
+        Napi::Error::New(env,
+            "queryBatchAsync(statements, resultsArray, callback) requires two arrays and a callback.")
+            .ThrowAsJavaScriptException();
+        return env.Undefined();
+    }
+    Napi::Array statementsArr = info[0].As<Napi::Array>();
+    Napi::Array resultsArr = info[1].As<Napi::Array>();
+    Napi::Function callback = info[2].As<Napi::Function>();
+    std::vector<std::string> statements;
+    statements.reserve(statementsArr.Length());
+    for (uint32_t i = 0; i < statementsArr.Length(); i++) {
+        Napi::Value v = statementsArr.Get(i);
+        if (!v.IsString()) {
+            Napi::Error::New(env, "queryBatchAsync: each statement must be a string.")
+                .ThrowAsJavaScriptException();
+            return env.Undefined();
+        }
+        statements.push_back(v.As<Napi::String>().Utf8Value());
+    }
+    if (resultsArr.Length() < statements.size()) {
+        Napi::Error::New(env,
+            "queryBatchAsync: resultsArray length must be >= statements length.")
+            .ThrowAsJavaScriptException();
+        return env.Undefined();
+    }
+    std::vector<NodeQueryResult*> nodeResults;
+    nodeResults.reserve(statements.size());
+    for (uint32_t i = 0; i < statements.size(); i++) {
+        nodeResults.push_back(
+            Napi::ObjectWrap<NodeQueryResult>::Unwrap(resultsArr.Get(i).As<Napi::Object>()));
+    }
+    auto* worker = new ConnectionQueryBatchAsyncWorker(
+        callback, connection, std::move(statements), std::move(nodeResults));
+    worker->Queue();
     return env.Undefined();
 }
 

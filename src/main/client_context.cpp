@@ -17,6 +17,7 @@
 #include "main/database.h"
 #include "main/database_manager.h"
 #include "main/db_config.h"
+#include "main/query_result/materialized_query_result.h"
 #include "optimizer/optimizer.h"
 #include "parser/parser.h"
 #include "parser/visitor/standalone_call_rewriter.h"
@@ -364,6 +365,69 @@ std::unique_ptr<QueryResult> ClientContext::query(std::string_view query,
     std::optional<uint64_t> queryID, QueryConfig config) {
     lock_t lck{mtx};
     return queryNoLock(query, queryID, config);
+}
+
+std::vector<std::unique_ptr<QueryResult>> ClientContext::queryBatch(
+    const std::vector<std::string>& statements) {
+    lock_t lck{mtx};
+    return queryBatchNoLock(statements);
+}
+
+std::vector<std::unique_ptr<QueryResult>> ClientContext::queryBatchNoLock(
+    const std::vector<std::string>& statements) {
+    std::vector<std::unique_ptr<QueryResult>> results;
+    results.reserve(statements.size());
+    QueryConfig config{};
+    for (const auto& queryString : statements) {
+        std::vector<std::shared_ptr<Statement>> parsedStatements;
+        try {
+            parsedStatements = parseQuery(queryString);
+        } catch (std::exception& exception) {
+            results.push_back(QueryResult::getQueryResultWithError(exception.what()));
+            return results;
+        }
+        std::unique_ptr<QueryResult> batchItemResult;
+        QueryResult* lastResult = nullptr;
+        double internalCompilingTime = 0.0, internalExecutionTime = 0.0;
+        for (const auto& statement : parsedStatements) {
+            auto [preparedStatement, cachedStatement] =
+                prepareNoLock(statement, false /*shouldCommitNewTransaction*/);
+            auto currentQueryResult =
+                executeNoLock(preparedStatement.get(), cachedStatement.get(), std::nullopt, config);
+            if (!currentQueryResult->isSuccess()) {
+                if (!lastResult) {
+                    batchItemResult = std::move(currentQueryResult);
+                } else {
+                    lastResult->addNextResult(std::move(currentQueryResult));
+                }
+                results.push_back(std::move(batchItemResult));
+                useInternalCatalogEntry_ = false;
+                return results;
+            }
+            auto currentQuerySummary = currentQueryResult->getQuerySummary();
+            if (statement->isInternal()) {
+                internalCompilingTime += currentQuerySummary->getCompilingTime();
+                internalExecutionTime += currentQuerySummary->getExecutionTime();
+                continue;
+            }
+            currentQuerySummary->incrementCompilingTime(internalCompilingTime);
+            currentQuerySummary->incrementExecutionTime(internalExecutionTime);
+            if (!lastResult) {
+                batchItemResult = std::move(currentQueryResult);
+                lastResult = batchItemResult.get();
+            } else {
+                auto current = currentQueryResult.get();
+                lastResult->addNextResult(std::move(currentQueryResult));
+                lastResult = current;
+            }
+        }
+        if (!batchItemResult) {
+            batchItemResult = std::make_unique<MaterializedQueryResult>();
+        }
+        results.push_back(std::move(batchItemResult));
+    }
+    useInternalCatalogEntry_ = false;
+    return results;
 }
 
 std::unique_ptr<QueryResult> ClientContext::queryNoLock(std::string_view query,

@@ -227,6 +227,30 @@ describe("Query", function () {
   });
 });
 
+describe("queryBatch", function () {
+  it("should return one result per statement in order", async function () {
+    const results = await conn.queryBatch(["RETURN 1", "RETURN 2", "RETURN 3"]);
+    assert.exists(results);
+    assert.equal(results.length, 3);
+    const rows = await Promise.all([results[0].getAll(), results[1].getAll(), results[2].getAll()]);
+    assert.deepEqual(rows, [[{ 1: 1 }], [{ 2: 2 }], [{ 3: 3 }]]);
+  });
+
+  it("should stop on first error and return results so far (last is error)", async function () {
+    const results = await conn.queryBatch([
+      "RETURN 1",
+      "MATCH (x:NonExistent) RETURN x",
+      "RETURN 3",
+    ]);
+    assert.equal(results.length, 2);
+    assert.isTrue(results[0].isSuccess());
+    const rows = await results[0].getAll();
+    assert.deepEqual(rows, [{ 1: 1 }]);
+    assert.isFalse(results[1].isSuccess());
+    assert.isNotEmpty(results[1].getErrorMessage());
+  });
+});
+
 describe("Timeout", function () {
   it("should abort a query if the timeout is reached", async function () {
     const newConn = new lbug.Connection(db);

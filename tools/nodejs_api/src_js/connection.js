@@ -552,6 +552,44 @@ class Connection {
   }
 
   /**
+   * Execute multiple queries in one lock and one transaction (batch).
+   * @param {Array<string>} statements array of Cypher statements.
+   * @returns {Promise<Array<lbug.QueryResult>>} promise that resolves to an array of query results (one per statement; on first error may be shorter, last result is error).
+   */
+  async queryBatch(statements) {
+    if (!Array.isArray(statements)) {
+      throw new Error("queryBatch: statements must be an array of strings.");
+    }
+    const connection = await this._getConnection();
+    const nodeResults = statements.map(() => new LbugNative.NodeQueryResult());
+    return new Promise((resolve, reject) => {
+      connection.queryBatchAsync(statements, nodeResults, (err, n) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(
+          nodeResults.slice(0, n).map((nr) => new QueryResult(this, nr))
+        );
+      });
+    });
+  }
+
+  /**
+   * Execute multiple queries in one lock and one transaction (batch), synchronously.
+   * @param {Array<string>} statements array of Cypher statements.
+   * @returns {Array<lbug.QueryResult>} array of query results (one per statement; on first error may be shorter, last result is error).
+   */
+  queryBatchSync(statements) {
+    if (!Array.isArray(statements)) {
+      throw new Error("queryBatchSync: statements must be an array of strings.");
+    }
+    const connection = this._getConnectionSync();
+    const nodeResults = statements.map(() => new LbugNative.NodeQueryResult());
+    const n = connection.queryBatchSync(statements, nodeResults);
+    return nodeResults.slice(0, n).map((nr) => new QueryResult(this, nr));
+  }
+
+  /**
    * Internal function to get the next query result for multiple query results.
    * @param {LbugNative.NodeQueryResult} nodeQueryResult the current node query result.
    * @returns {Promise<lbug.QueryResult>} a promise that resolves to the next query result. The promise is rejected if there is an error.

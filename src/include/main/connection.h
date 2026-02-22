@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "client_context.h"
 #include "database.h"
 #include "function/udf_function.h"
@@ -48,6 +50,10 @@ public:
     LBUG_API std::unique_ptr<QueryResult> query(std::string_view query);
 
     LBUG_API std::unique_ptr<QueryResult> queryAsArrow(std::string_view query, int64_t chunkSize);
+    /** Executes multiple queries in one lock and one transaction. Returns one result per input
+     * string. */
+    LBUG_API std::vector<std::unique_ptr<QueryResult>> queryBatch(
+        const std::vector<std::string>& statements);
 
     /**
      * @brief Prepares the given query and returns the prepared statement.

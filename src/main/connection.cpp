@@ -79,6 +79,18 @@ std::unique_ptr<QueryResult> Connection::queryWithID(std::string_view queryState
     return queryResult;
 }
 
+std::vector<std::unique_ptr<QueryResult>> Connection::queryBatch(
+    const std::vector<std::string>& statements) {
+    dbLifeCycleManager->checkDatabaseClosedOrThrow();
+    auto results = clientContext->queryBatch(statements);
+    for (auto& result : results) {
+        if (result) {
+            result->setDBLifeCycleManager(dbLifeCycleManager);
+        }
+    }
+    return results;
+}
+
 void Connection::interrupt() {
     dbLifeCycleManager->checkDatabaseClosedOrThrow();
     clientContext->interrupt();

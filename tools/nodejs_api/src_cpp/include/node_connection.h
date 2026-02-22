@@ -1,6 +1,7 @@
 #pragma once
 
 #include <utility>
+#include <vector>
 
 #include "common/task_system/progress_bar.h"
 #include "main/lbug.h"
@@ -18,6 +19,7 @@ class NodeConnection : public Napi::ObjectWrap<NodeConnection> {
     friend class ConnectionInitAsyncWorker;
     friend class ConnectionExecuteAsyncWorker;
     friend class ConnectionQueryAsyncWorker;
+    friend class ConnectionQueryBatchAsyncWorker;
     friend class NodePreparedStatement;
 
 public:
@@ -36,6 +38,8 @@ private:
     Napi::Value QueryAsync(const Napi::CallbackInfo& info);
     Napi::Value ExecuteSync(const Napi::CallbackInfo& info);
     Napi::Value QuerySync(const Napi::CallbackInfo& info);
+    Napi::Value QueryBatchSync(const Napi::CallbackInfo& info);
+    Napi::Value QueryBatchAsync(const Napi::CallbackInfo& info);
     void Close(const Napi::CallbackInfo& info);
     Napi::Value RegisterStream(const Napi::CallbackInfo& info);
     void UnregisterStream(const Napi::CallbackInfo& info);
@@ -185,6 +189,40 @@ private:
     std::string statement;
     NodeQueryResult* nodeQueryResult;
     std::optional<Napi::ThreadSafeFunction> progressCallback;
+};
+
+class ConnectionQueryBatchAsyncWorker : public Napi::AsyncWorker {
+public:
+    ConnectionQueryBatchAsyncWorker(Napi::Function& callback,
+        std::shared_ptr<Connection>& connection, std::vector<std::string> statements,
+        std::vector<NodeQueryResult*> nodeResults)
+        : Napi::AsyncWorker(callback), connection(connection),
+          statements(std::move(statements)), nodeResults(std::move(nodeResults)) {}
+
+    ~ConnectionQueryBatchAsyncWorker() override = default;
+
+    void Execute() override {
+        try {
+            results = connection->queryBatch(statements);
+            for (size_t i = 0; i < results.size() && i < nodeResults.size(); i++) {
+                nodeResults[i]->SetQueryResult(results[i].release(), true);
+            }
+            resultCount = static_cast<uint32_t>(results.size());
+        } catch (const std::exception& exc) {
+            SetError(std::string(exc.what()));
+        }
+    }
+
+    void OnOK() override { Callback().Call({Env().Null(), Napi::Number::New(Env(), resultCount)}); }
+
+    void OnError(Napi::Error const& error) override { Callback().Call({error.Value()}); }
+
+private:
+    std::shared_ptr<Connection> connection;
+    std::vector<std::string> statements;
+    std::vector<NodeQueryResult*> nodeResults;
+    std::vector<std::unique_ptr<lbug::main::QueryResult>> results;
+    uint32_t resultCount = 0;
 };
 
 } // namespace main

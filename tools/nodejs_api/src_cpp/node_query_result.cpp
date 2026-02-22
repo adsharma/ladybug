@@ -26,6 +26,8 @@ Napi::Object NodeQueryResult::Init(Napi::Env env, Napi::Object exports) {
             InstanceMethod("getQuerySummaryAsync", &NodeQueryResult::GetQuerySummaryAsync),
             InstanceMethod("getQuerySummarySync", &NodeQueryResult::GetQuerySummarySync),
             InstanceMethod("toStringSync", &NodeQueryResult::GetToStringSync),
+            InstanceMethod("isSuccess", &NodeQueryResult::IsSuccess),
+            InstanceMethod("getErrorMessage", &NodeQueryResult::GetErrorMessage),
             InstanceMethod("close", &NodeQueryResult::Close)});
 
     exports.Set("NodeQueryResult", t);
@@ -238,6 +240,24 @@ Napi::Value NodeQueryResult::GetToStringSync(const Napi::CallbackInfo& info) {
         Napi::Error::New(env, std::string(exc.what())).ThrowAsJavaScriptException();
     }
     return env.Undefined();
+}
+
+Napi::Value NodeQueryResult::IsSuccess(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    Napi::HandleScope scope(env);
+    if (!this->queryResult) {
+        return Napi::Boolean::New(env, false);
+    }
+    return Napi::Boolean::New(env, this->queryResult->isSuccess());
+}
+
+Napi::Value NodeQueryResult::GetErrorMessage(const Napi::CallbackInfo& info) {
+    Napi::Env env = info.Env();
+    Napi::HandleScope scope(env);
+    if (!this->queryResult) {
+        return Napi::String::New(env, "");
+    }
+    return Napi::String::New(env, this->queryResult->getErrorMessage());
 }
 
 void NodeQueryResult::Close(const Napi::CallbackInfo& info) {

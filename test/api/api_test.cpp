@@ -162,6 +162,26 @@ TEST_F(ApiTest, MultipleQuery) {
     ASSERT_EQ(result->getNextQueryResult()->toString(), "3\n3\n");
 }
 
+TEST_F(ApiTest, QueryBatch) {
+    auto results = conn->queryBatch({"return 1", "return 2", "return 3"});
+    ASSERT_EQ(results.size(), 3u);
+    ASSERT_TRUE(results[0]->isSuccess());
+    ASSERT_TRUE(results[1]->isSuccess());
+    ASSERT_TRUE(results[2]->isSuccess());
+    ASSERT_EQ(results[0]->toString(), "1\n1\n");
+    ASSERT_EQ(results[1]->toString(), "2\n2\n");
+    ASSERT_EQ(results[2]->toString(), "3\n3\n");
+}
+
+TEST_F(ApiTest, QueryBatchErrorInMiddle) {
+    auto results = conn->queryBatch({"return 1", "MATCH (x:NonExistent) RETURN x", "return 3"});
+    ASSERT_EQ(results.size(), 2u);
+    ASSERT_TRUE(results[0]->isSuccess());
+    ASSERT_EQ(results[0]->toString(), "1\n1\n");
+    ASSERT_FALSE(results[1]->isSuccess());
+    ASSERT_FALSE(results[1]->getErrorMessage().empty());
+}
+
 TEST_F(ApiTest, SingleQueryHasNextQueryResult) {
     auto result = conn->query("MATCH (a:person) RETURN a.fName;");
     ASSERT_TRUE(result->isSuccess());
