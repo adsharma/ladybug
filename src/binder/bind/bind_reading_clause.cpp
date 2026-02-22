@@ -18,6 +18,9 @@ std::unique_ptr<BoundReadingClause> Binder::bindReadingClause(const ReadingClaus
     case ClauseType::IN_QUERY_CALL: {
         return bindInQueryCall(readingClause);
     }
+    case ClauseType::CALL_SUBQUERY: {
+        return bindCallSubquery(readingClause);
+    }
     case ClauseType::LOAD_FROM: {
         return bindLoadFrom(readingClause);
     }

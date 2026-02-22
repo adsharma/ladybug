@@ -222,6 +222,8 @@ public:
     std::unique_ptr<BoundReadingClause> bindUnwindClause(
         const parser::ReadingClause& readingClause);
     std::unique_ptr<BoundReadingClause> bindInQueryCall(const parser::ReadingClause& readingClause);
+    std::unique_ptr<BoundReadingClause> bindCallSubquery(
+        const parser::ReadingClause& readingClause);
     std::unique_ptr<BoundReadingClause> bindLoadFrom(const parser::ReadingClause& readingClause);
 
     /*** bind updating clause ***/

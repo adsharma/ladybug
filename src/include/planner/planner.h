@@ -112,6 +112,7 @@ public:
     void planMatchClause(const binder::BoundReadingClause& readingClause, LogicalPlan& plan);
     void planUnwindClause(const binder::BoundReadingClause& readingClause, LogicalPlan& plan);
     void planTableFunctionCall(const binder::BoundReadingClause& readingClause, LogicalPlan& plan);
+    void planCallSubquery(const binder::BoundReadingClause& readingClause, LogicalPlan& plan);
 
     void planReadOp(std::shared_ptr<LogicalOperator> op,
         const binder::expression_vector& predicates, LogicalPlan& plan);

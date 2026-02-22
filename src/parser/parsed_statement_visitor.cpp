@@ -130,6 +130,9 @@ void StatementVisitor::visitReadingClause(const ReadingClause* readingClause) {
     case ClauseType::IN_QUERY_CALL: {
         visitInQueryCall(readingClause);
     } break;
+    case ClauseType::CALL_SUBQUERY: {
+        visitCallSubquery(readingClause);
+    } break;
     case ClauseType::LOAD_FROM: {
         visitLoadFrom(readingClause);
     } break;

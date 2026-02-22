@@ -56,6 +56,9 @@ std::unique_ptr<PhysicalOperator> PlanMapper::mapOperator(const LogicalOperator*
     case LogicalOperatorType::ATTACH_DATABASE: {
         physicalOperator = mapAttachDatabase(logicalOperator);
     } break;
+    case LogicalOperatorType::CALL_SUBQUERY: {
+        physicalOperator = mapCallSubquery(logicalOperator);
+    } break;
     case LogicalOperatorType::COPY_FROM: {
         physicalOperator = mapCopyFrom(logicalOperator);
     } break;

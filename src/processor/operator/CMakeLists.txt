@@ -13,6 +13,7 @@ add_library(lbug_processor_operator
         OBJECT
         arrow_result_collector.cpp
         base_partitioner_shared_state.cpp
+        call_subquery.cpp
         cross_product.cpp
         empty_result.cpp
         filter.cpp

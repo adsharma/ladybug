@@ -19,6 +19,7 @@ public:
         return expressions[nameToExprIdx.at(varName)];
     }
     expression_vector getExpressions() const { return expressions; }
+    std::vector<std::pair<std::string, std::shared_ptr<Expression>>> getExpressionPairs() const;
     void addExpression(const std::string& varName, std::shared_ptr<Expression> expression);
     void replaceExpression(const std::string& oldName, const std::string& newName,
         std::shared_ptr<Expression> expression);

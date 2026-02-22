@@ -21,6 +21,7 @@ enum class PhysicalOperatorType : uint8_t {
     AGGREGATE_SCAN,
     ATTACH_DATABASE,
     BATCH_INSERT,
+    CALL_SUBQUERY,
     COPY_TO,
     COUNT_REL_TABLE,
     CREATE_GRAPH,

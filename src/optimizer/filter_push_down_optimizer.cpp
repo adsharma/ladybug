@@ -41,6 +41,9 @@ std::shared_ptr<LogicalOperator> FilterPushDownOptimizer::visitOperator(
     case LogicalOperatorType::TABLE_FUNCTION_CALL: {
         return visitTableFunctionCallReplace(op);
     }
+    case LogicalOperatorType::CALL_SUBQUERY: {
+        return op;
+    }
     default: { // Stop current push down for unhandled operator.
         return visitChildren(op);
     }

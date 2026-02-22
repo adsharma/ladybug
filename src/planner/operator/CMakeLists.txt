@@ -8,6 +8,7 @@ add_subdirectory(sip)
 add_library(lbug_planner_operator
         OBJECT
         logical_accumulate.cpp
+        logical_call_subquery.cpp
         logical_aggregate.cpp
         logical_create_macro.cpp
         logical_cross_product.cpp

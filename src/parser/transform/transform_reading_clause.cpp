@@ -1,4 +1,5 @@
 #include "common/assert.h"
+#include "parser/query/reading_clause/call_subquery_clause.h"
 #include "parser/query/reading_clause/in_query_call_clause.h"
 #include "parser/query/reading_clause/load_from.h"
 #include "parser/query/reading_clause/match_clause.h"
@@ -84,6 +85,9 @@ std::vector<YieldVariable> Transformer::transformYieldVariables(
 
 std::unique_ptr<ReadingClause> Transformer::transformInQueryCall(
     CypherParser::KU_InQueryCallContext& ctx) {
+    if (ctx.kU_CallSubquery()) {
+        return transformCallSubquery(*ctx.kU_CallSubquery());
+    }
     auto functionExpression =
         Transformer::transformFunctionInvocation(*ctx.oC_FunctionInvocation());
     std::vector<YieldVariable> yieldVariables;
@@ -96,6 +100,26 @@ std::unique_ptr<ReadingClause> Transformer::transformInQueryCall(
         inQueryCall->setWherePredicate(transformWhere(*ctx.oC_Where()));
     }
     return inQueryCall;
+}
+
+std::unique_ptr<ReadingClause> Transformer::transformCallSubquery(
+    CypherParser::KU_CallSubqueryContext& ctx) {
+    auto& scopeCtx = *ctx.kU_CallSubqueryScope();
+    bool importAll = (scopeCtx.STAR() != nullptr);
+    std::vector<std::string> scopeVariableNames;
+    if (!importAll && !scopeCtx.oC_Variable().empty()) {
+        for (auto* varCtx : scopeCtx.oC_Variable()) {
+            scopeVariableNames.push_back(transformVariable(*varCtx));
+        }
+    }
+    auto& bodyCtx = *ctx.kU_CallSubqueryBody();
+    SingleQuery innerQuery;
+    for (auto* readingCtx : bodyCtx.oC_ReadingClause()) {
+        innerQuery.addReadingClause(transformReadingClause(*readingCtx));
+    }
+    innerQuery.setReturnClause(transformReturn(*bodyCtx.oC_Return()));
+    return std::make_unique<CallSubqueryClause>(
+        importAll, std::move(scopeVariableNames), std::move(innerQuery));
 }
 
 std::unique_ptr<ReadingClause> Transformer::transformLoadFrom(

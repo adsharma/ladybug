@@ -82,6 +82,9 @@ void LogicalOperatorVisitor::visitOperatorSwitch(LogicalOperator* op) {
     case LogicalOperatorType::TABLE_FUNCTION_CALL: {
         visitTableFunctionCall(op);
     } break;
+    case LogicalOperatorType::CALL_SUBQUERY: {
+        visitCallSubquery(op);
+    } break;
     case LogicalOperatorType::UNION_ALL: {
         visitUnion(op);
     } break;
@@ -173,6 +176,9 @@ std::shared_ptr<LogicalOperator> LogicalOperatorVisitor::visitOperatorReplaceSwi
     }
     case LogicalOperatorType::TABLE_FUNCTION_CALL: {
         return visitTableFunctionCallReplace(op);
+    }
+    case LogicalOperatorType::CALL_SUBQUERY: {
+        return visitCallSubqueryReplace(op);
     }
     case LogicalOperatorType::UNION_ALL: {
         return visitUnionReplace(op);

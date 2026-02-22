@@ -31,6 +31,7 @@ private:
     virtual void visitMatch(const ReadingClause* /*readingClause*/) {}
     virtual void visitUnwind(const ReadingClause* /*readingClause*/) {}
     virtual void visitInQueryCall(const ReadingClause* /*readingClause*/) {}
+    virtual void visitCallSubquery(const ReadingClause* /*readingClause*/) {}
     virtual void visitLoadFrom(const ReadingClause* /*readingClause*/) {}
     virtual void visitUpdatingClause(const UpdatingClause* /*updatingClause*/);
     virtual void visitSet(const UpdatingClause* /*updatingClause*/) {}

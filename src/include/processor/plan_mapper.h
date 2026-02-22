@@ -160,6 +160,8 @@ public:
         const planner::LogicalOperator* logicalOperator);
     std::unique_ptr<PhysicalOperator> mapTableFunctionCall(
         const planner::LogicalOperator* logicalOperator);
+    std::unique_ptr<PhysicalOperator> mapCallSubquery(
+        const planner::LogicalOperator* logicalOperator);
     std::unique_ptr<PhysicalOperator> mapTransaction(
         const planner::LogicalOperator* logicalOperator);
     std::unique_ptr<PhysicalOperator> mapUnionAll(const planner::LogicalOperator* logicalOperator);

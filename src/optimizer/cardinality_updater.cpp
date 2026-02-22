@@ -61,6 +61,10 @@ void CardinalityUpdater::visitOperatorSwitchWithDefault(planner::LogicalOperator
         visitAggregate(op);
         break;
     }
+    case planner::LogicalOperatorType::CALL_SUBQUERY: {
+        op->setCardinality(op->getChild(1)->getCardinality());
+        break;
+    }
     default: {
         visitOperatorDefault(op);
         break;

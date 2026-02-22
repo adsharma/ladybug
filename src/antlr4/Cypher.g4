@@ -315,7 +315,22 @@ oC_YieldItems
           :  oC_YieldItem ( SP? ',' SP? oC_YieldItem )* ;
 
 kU_InQueryCall
-    : CALL SP oC_FunctionInvocation (SP? oC_Where)? ( SP? YIELD SP oC_YieldItems )? ;
+    : CALL SP oC_FunctionInvocation (SP? oC_Where)? ( SP? YIELD SP oC_YieldItems )?
+    | CALL SP kU_CallSubquery
+    ;
+
+kU_CallSubquery
+    : '(' SP? kU_CallSubqueryScope SP? ')' SP? '{' SP? kU_CallSubqueryBody SP? '}'
+    ;
+
+kU_CallSubqueryScope
+    : '*'
+    | ( oC_Variable ( SP? ',' SP? oC_Variable )* )?
+    ;
+
+kU_CallSubqueryBody
+    : ( oC_ReadingClause SP? )* oC_Return
+    ;
 
 oC_Match
     : ( OPTIONAL SP )? MATCH SP? oC_Pattern ( SP oC_Where )? ( SP kU_Hint )? ;

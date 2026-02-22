@@ -165,6 +165,12 @@ protected:
         return op;
     }
 
+    virtual void visitCallSubquery(planner::LogicalOperator*) {}
+    virtual std::shared_ptr<planner::LogicalOperator> visitCallSubqueryReplace(
+        std::shared_ptr<planner::LogicalOperator> op) {
+        return op;
+    }
+
     virtual void visitUnion(planner::LogicalOperator* /*op*/) {}
     virtual std::shared_ptr<planner::LogicalOperator> visitUnionReplace(
         std::shared_ptr<planner::LogicalOperator> op) {

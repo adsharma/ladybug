@@ -19,6 +19,7 @@ enum class ClauseType : uint8_t {
     TABLE_FUNCTION_CALL = 13,
     GDS_CALL = 14,
     LOAD_FROM = 15,
+    CALL_SUBQUERY = 16,
 };
 
 enum class MatchClauseType : uint8_t {

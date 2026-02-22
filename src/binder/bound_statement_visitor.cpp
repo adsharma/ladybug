@@ -178,6 +178,9 @@ void BoundStatementVisitor::visitReadingClause(const BoundReadingClause& reading
     case ClauseType::TABLE_FUNCTION_CALL: {
         visitTableFunctionCall(readingClause);
     } break;
+    case ClauseType::CALL_SUBQUERY: {
+        visitCallSubquery(readingClause);
+    } break;
     case ClauseType::LOAD_FROM: {
         visitLoadFrom(readingClause);
     } break;
@@ -196,6 +199,9 @@ void BoundStatementVisitor::visitReadingClauseUnsafe(BoundReadingClause& reading
     } break;
     case ClauseType::TABLE_FUNCTION_CALL: {
         visitTableFunctionCall(readingClause);
+    } break;
+    case ClauseType::CALL_SUBQUERY: {
+        visitCallSubquery(readingClause);
     } break;
     case ClauseType::LOAD_FROM: {
         visitLoadFrom(readingClause);

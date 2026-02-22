@@ -1,5 +1,6 @@
 add_library(lbug_binder_bind_read
         OBJECT
+        bind_call_subquery.cpp
         bind_in_query_call.cpp
         bind_load_from.cpp
         bind_match.cpp

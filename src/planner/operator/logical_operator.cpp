@@ -18,6 +18,8 @@ std::string LogicalOperatorUtils::logicalOperatorTypeToString(LogicalOperatorTyp
         return "ALTER";
     case LogicalOperatorType::ATTACH_DATABASE:
         return "ATTACH_DATABASE";
+    case LogicalOperatorType::CALL_SUBQUERY:
+        return "CALL_SUBQUERY";
     case LogicalOperatorType::COPY_FROM:
         return "COPY_FROM";
     case LogicalOperatorType::COPY_TO:
