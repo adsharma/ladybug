@@ -3742,12 +3742,13 @@ static art_indexed_child_t art_node_next_child(const art_node_t *node,
                                                art_typecode_t typecode,
                                                int index) {
     switch (typecode) {
-        case CROARING_ART_LEAF_TYPE:
-            return (art_indexed_child_t){
-                .child = CROARING_ART_NULL_REF,
-                .index = 0,
-                .key_chunk = 0,
-            };
+        case CROARING_ART_LEAF_TYPE: {
+            art_indexed_child_t r;
+            r.child = CROARING_ART_NULL_REF;
+            r.index = 0;
+            r.key_chunk = 0;
+            return r;
+        }
         case CROARING_ART_NODE4_TYPE:
             return art_node4_next_child((art_node4_t *)node, index);
         case CROARING_ART_NODE16_TYPE:
@@ -3756,9 +3757,11 @@ static art_indexed_child_t art_node_next_child(const art_node_t *node,
             return art_node48_next_child((art_node48_t *)node, index);
         case CROARING_ART_NODE256_TYPE:
             return art_node256_next_child((art_node256_t *)node, index);
-        default:
+        default: {
+            art_indexed_child_t r = {0, 0, 0};
             assert(false);
-            return (art_indexed_child_t){0, 0, 0};
+            return r;
+        }
     }
 }
 
@@ -3768,12 +3771,13 @@ static art_indexed_child_t art_node_prev_child(const art_node_t *node,
                                                art_typecode_t typecode,
                                                int index) {
     switch (typecode) {
-        case CROARING_ART_LEAF_TYPE:
-            return (art_indexed_child_t){
-                .child = CROARING_ART_NULL_REF,
-                .index = 0,
-                .key_chunk = 0,
-            };
+        case CROARING_ART_LEAF_TYPE: {
+            art_indexed_child_t r;
+            r.child = CROARING_ART_NULL_REF;
+            r.index = 0;
+            r.key_chunk = 0;
+            return r;
+        }
         case CROARING_ART_NODE4_TYPE:
             return art_node4_prev_child((art_node4_t *)node, index);
         case CROARING_ART_NODE16_TYPE:
@@ -3782,9 +3786,11 @@ static art_indexed_child_t art_node_prev_child(const art_node_t *node,
             return art_node48_prev_child((art_node48_t *)node, index);
         case CROARING_ART_NODE256_TYPE:
             return art_node256_prev_child((art_node256_t *)node, index);
-        default:
+        default: {
+            art_indexed_child_t r = {0, 0, 0};
             assert(false);
-            return (art_indexed_child_t){0, 0, 0};
+            return r;
+        }
     }
 }
 
@@ -3795,12 +3801,13 @@ static art_indexed_child_t art_node_child_at(const art_node_t *node,
                                              art_typecode_t typecode,
                                              int index) {
     switch (typecode) {
-        case CROARING_ART_LEAF_TYPE:
-            return (art_indexed_child_t){
-                .child = CROARING_ART_NULL_REF,
-                .index = 0,
-                .key_chunk = 0,
-            };
+        case CROARING_ART_LEAF_TYPE: {
+            art_indexed_child_t r;
+            r.child = CROARING_ART_NULL_REF;
+            r.index = 0;
+            r.key_chunk = 0;
+            return r;
+        }
         case CROARING_ART_NODE4_TYPE:
             return art_node4_child_at((art_node4_t *)node, index);
         case CROARING_ART_NODE16_TYPE:
@@ -3809,9 +3816,11 @@ static art_indexed_child_t art_node_child_at(const art_node_t *node,
             return art_node48_child_at((art_node48_t *)node, index);
         case CROARING_ART_NODE256_TYPE:
             return art_node256_child_at((art_node256_t *)node, index);
-        default:
+        default: {
+            art_indexed_child_t r = {0, 0, 0};
             assert(false);
-            return (art_indexed_child_t){0, 0, 0};
+            return r;
+        }
     }
 }
 
@@ -3821,12 +3830,13 @@ static art_indexed_child_t art_node_lower_bound(const art_node_t *node,
                                                 art_typecode_t typecode,
                                                 art_key_chunk_t key_chunk) {
     switch (typecode) {
-        case CROARING_ART_LEAF_TYPE:
-            return (art_indexed_child_t){
-                .child = CROARING_ART_NULL_REF,
-                .index = 0,
-                .key_chunk = 0,
-            };
+        case CROARING_ART_LEAF_TYPE: {
+            art_indexed_child_t r;
+            r.child = CROARING_ART_NULL_REF;
+            r.index = 0;
+            r.key_chunk = 0;
+            return r;
+        }
         case CROARING_ART_NODE4_TYPE:
             return art_node4_lower_bound((art_node4_t *)node, key_chunk);
         case CROARING_ART_NODE16_TYPE:
@@ -3835,9 +3845,11 @@ static art_indexed_child_t art_node_lower_bound(const art_node_t *node,
             return art_node48_lower_bound((art_node48_t *)node, key_chunk);
         case CROARING_ART_NODE256_TYPE:
             return art_node256_lower_bound((art_node256_t *)node, key_chunk);
-        default:
+        default: {
+            art_indexed_child_t r = {0, 0, 0};
             assert(false);
-            return (art_indexed_child_t){0, 0, 0};
+            return r;
+        }
     }
 }
 
