@@ -22,3 +22,6 @@
 [submodule "tools/wasm"]
 	path = tools/wasm
 	url = https://github.com/ladybugdb/ladybug-wasm
+[submodule ".agents/skills/ladybug-skill"]
+	path = .agents/skills/ladybug-skill
+	url = https://github.com/LadybugDB/ladybug-skill/
